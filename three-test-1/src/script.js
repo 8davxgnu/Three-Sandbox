@@ -19,7 +19,7 @@ camera.position.z = 1;
 
 
 const gltfLoader = new GLTFLoader();
-const url = '/static/bear_glb.glb';
+const url = '/bear_glb.glb';
 gltfLoader.load(url, (gltf) => {
     const root = gltf.scene;
     scene.add(root);
