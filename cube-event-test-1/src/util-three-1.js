@@ -16,7 +16,7 @@ export function createScene() {
  */
 export function createCube([a,b,c], color, [x, y, z]) {
   const geometry = new THREE.BoxGeometry( a, b, c );
-  const material = new THREE.MeshBasicMaterial( { color: color } );
+  const material = new THREE.MeshBasicMaterial({color: color});
   const cube = new THREE.Mesh( geometry, material );
   cube.position.set(x, y, z)
   return cube

@@ -16,7 +16,7 @@ const controls = new OrbitControls(camera, document.body);
 controls.target.set(0, 0, 0);  // pt of focus for the orbit
 controls.update();
 
-const cube1 = createCube([1, 1, 1], '0x00ff00', [0, 0, 0])
+const cube1 = createCube([1, 1, 1], 0x00ff00, [0, 0, 0])
 scene.add( cube1 );
 
 
