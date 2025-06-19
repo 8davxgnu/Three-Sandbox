@@ -1,13 +1,13 @@
 import './style.css'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <h1>Vite + TypeScript</h1>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+// document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
+//   <div>
+//     <h1>Vite + TypeScript</h1>
+//     <p class="read-the-docs">
+//       Click on the Vite and TypeScript logos to learn more
+//     </p>
+//   </div>
+// `
 
 import {
   createScene,
@@ -45,33 +45,38 @@ function animate() {
 }
 renderer.setAnimationLoop( animate );
 
-let keyA, keyB, keyC, keyD, keyE, keyF, keyG = false;
-const cubeDict = {
-  A: [cubeA, keyA],
-  B: [cubeB, keyB],
-  C: [cubeC, keyC],
-  D: [cubeD, keyD],
-  E: [cubeE, keyE],
-  F: [cubeF, keyF],
-  G: [cubeG, keyG]
+type CubeEntry = [THREE.Mesh, boolean];
+
+const cubeDict: Record<'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G', CubeEntry> = {
+  A: [cubeA, false],
+  B: [cubeB, false],
+  C: [cubeC, false],
+  D: [cubeD, false],
+  E: [cubeE, false],
+  F: [cubeF, false],
+  G: [cubeG, false]
 };
 
-window.addEventListener('keydown', function(event){
-  const userInput = event.key.toLowerCase();
-  if (('abcdefg'.includes(userInput.toLowerCase()))) {
-    if (!cubeDict[userInput.toUpperCase()][1]) {
-      (cubeDict[userInput.toUpperCase()][0]).translateY(-0.5);
-      cubeDict[userInput.toUpperCase()][1] = true;
+window.addEventListener('keydown', function(event) {
+  const userInput: string = event.key.toLowerCase();
+  const key = userInput.toUpperCase() as keyof typeof cubeDict;
+
+  if ('abcdefg'.includes(userInput)) {
+    if (!cubeDict[key][1]) {
+      cubeDict[key][0].translateY(-0.5);
+      cubeDict[key][1] = true;
     }
   }
 });
 
-window.addEventListener('keyup', function(event){
-  const userInput = event.key.toLowerCase();
-  if (('abcdefg'.includes(userInput.toLowerCase()))) {
-    (cubeDict[userInput.toUpperCase()][0]).translateY(0.5);
-    cubeDict[userInput.toUpperCase()][1] = false;
-    
+
+window.addEventListener('keyup', function(event) {
+  const userInput: string = event.key.toLowerCase();
+  const key = userInput.toUpperCase() as keyof typeof cubeDict;
+
+  if ('abcdefg'.includes(userInput)) {
+      cubeDict[key][0].translateY(0.5);
+      cubeDict[key][1] = false;
   }
 });
 
