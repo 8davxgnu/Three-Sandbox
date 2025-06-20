@@ -1,0 +1,125 @@
+import { 
+    getOctaves,
+    getNotes,
+    formatNotes,
+    buildStaveNotes,
+    generateStave,
+    changeStaveNoteColor,
+    renderStaveNotes,
+    generateClef,
+    getEnabledClefs
+} from './util_musicBuilder.js'
+import { Formatter, Renderer, Stave, Voice } from 'vexflow'
+// ---------------------------------------------------------------------------------------------
+export function initializeVexflow(containerElement) {
+    // Find elements *inside* the container passed from main.ts
+    const outputDiv = containerElement.querySelector('#output');
+    const startButton = containerElement.querySelector('#startGameButton');
+
+    if (!outputDiv || !startButton) {
+        console.error("Required elements for VexFlow not found in the container!");
+        return;
+    }
+
+    const renderer = new Renderer(outputDiv, Renderer.Backends.SVG);
+
+    // Configure the rendering context.
+    renderer.resize(500, 300);
+    const context = renderer.getContext();
+    context.setFont('Arial', 10);
+    // ---------------------------------------------------------------------------------------------
+    let currentIndex = 0;
+    const time_signature = '4/4';
+    let answers;
+    let staveNotes;
+    let voice;
+    let stave;
+    let game_running;
+    let coolDown = 1000;
+    const CLEF_OCTAVE_RANGE = {  // Default octave ranges
+        treble: [4, 5],
+        bass: [2, 4],
+        tenor: [3,4],
+        alto: [3, 4]
+    };
+
+    // Initial Stave Render
+    stave = new Stave(50, 50, 400);
+    stave.addTimeSignature(time_signature);
+    stave.setContext(context).draw();
+    console.log("Initial stave drawn");
+
+    function startNewRound() { 
+        const enabledClefs = getEnabledClefs();
+        // console.log(enabledClefs);
+
+        if ((enabledClefs.length > 0) && (!game_running)) {
+            game_running = true;
+            runGameLogic(enabledClefs);
+        } else if (game_running){
+            console.log("Game already running")
+            return;
+        } else {
+            // No clefs selected
+            game_running = false;
+            context.clear();
+            stave = new Stave(50, 50, 400);
+            stave.addTimeSignature(time_signature);
+            stave.setContext(context).draw();
+            console.log("No clefs selected");
+        } 
+    }
+
+    function runGameLogic(enabledClefs) {
+        context.clear()
+        currentIndex = 0;
+        let cleff = generateClef(enabledClefs);
+        let octaveRange = CLEF_OCTAVE_RANGE[cleff];
+
+        // Create a stave of width 400 at position 
+        stave = generateStave(50, 50, 400, cleff, time_signature)
+
+        // Connect it to the rendering context and draw
+        stave.setContext(context).draw();
+
+        ({ answers, staveNotes, voice } = renderStaveNotes(cleff, time_signature, context, stave, octaveRange));
+        console.log(answers)
+        
+    }
+
+    // Attach listener to the button found within the container
+    startButton.addEventListener('click', startNewRound);
+
+    window.addEventListener('keydown', function(event) {
+        const userInput = event.key.toLowerCase();
+
+        // Only process if it's a valid note key (a-g)
+        if (!'abcdefg'.includes(userInput)) return;
+        if (currentIndex < answers.length) {
+            if (userInput === answers[currentIndex]) {
+                changeStaveNoteColor(staveNotes, currentIndex, 'green');
+                voice.draw(context, stave);
+            } else {
+                changeStaveNoteColor(staveNotes, currentIndex, 'red');
+                voice.draw(context, stave);
+            }
+
+            // Move to next note
+            currentIndex++;
+
+            // Check if all notes answered
+            if (currentIndex >= answers.length) {
+                console.log("Starting new round.")
+                setTimeout(() => {  
+                    game_running = false;
+                    startNewRound();
+                }, coolDown);
+            
+            }
+        }
+        else {
+            console.log("All notes answered.")
+        }
+
+    });
+}

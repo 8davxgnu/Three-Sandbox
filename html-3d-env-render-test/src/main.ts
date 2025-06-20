@@ -1,20 +1,13 @@
 import './style.css'
-
-// document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-//   <div>
-//     <h1>Vite + TypeScript</h1>
-//     <p class="read-the-docs">
-//       Click on the Vite and TypeScript logos to learn more
-//     </p>
-//   </div>
-// `
-
 import {
   createScene,
-  createCube
 } from './util';
+import { musicHTML } from './musicHTML';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import { CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
+import { CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+import { initializeVexflow } from './musicRender';
 
 // Set up Scene Environment Items
 let { scene, camera, renderer } = createScene();
@@ -22,61 +15,44 @@ let { scene, camera, renderer } = createScene();
 document.body.appendChild(renderer.domElement);
 const color = new THREE.Color(0x12121f);
 scene.background = color
-camera.position.z = 5;
+camera.position.z = 800;
 
 // Orbit Controls (optional)
 const controls = new OrbitControls(camera, document.body);
 controls.target.set(0, 0, 0);  // pt of focus for the orbit
 controls.update();
 
-//  Create Cubes
-const cubeA = createCube([1, 1, 1], 0xff0000, [-4.5, 0, 0])
-const cubeB = createCube([1, 1, 1], 0xff9f00, [-3, 0, 0])
-const cubeC = createCube([1, 1, 1], 0xffff00, [-1.5, 0, 0])
-const cubeD = createCube([1, 1, 1], 0x00ff00, [0, 0, 0])
-const cubeE = createCube([1, 1, 1], 0x0000ff, [1.5, 0, 0])
-const cubeF = createCube([1, 1, 1], 0x9f00ff, [3, 0, 0])
-const cubeG = createCube([1, 1, 1], 0xf900ff, [4.5, 0, 0])
-scene.add( cubeA, cubeB, cubeC, cubeD, cubeE, cubeF, cubeG );
-
 //  Animation Loop
 function animate() {
   renderer.render( scene, camera );
+  cssRenderer.render(scene, camera);  // renders CSS3D objects
 }
 renderer.setAnimationLoop( animate );
 
-type CubeEntry = [THREE.Mesh, boolean];
+const cssRenderer = new CSS3DRenderer();
+cssRenderer.setSize(window.innerWidth, window.innerHeight);
+cssRenderer.domElement.style.position = 'absolute';
+cssRenderer.domElement.style.top = '0';
+document.body.appendChild(cssRenderer.domElement);
 
-const cubeDict: Record<'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G', CubeEntry> = {
-  A: [cubeA, false],
-  B: [cubeB, false],
-  C: [cubeC, false],
-  D: [cubeD, false],
-  E: [cubeE, false],
-  F: [cubeF, false],
-  G: [cubeG, false]
-};
+const div = document.createElement('div');
+div.innerHTML = musicHTML; // interactive HTML
+div.style.width = '5rem';
+div.style.height = '5rem';
+div.style.opacity = '0.8';
+div.style.background = 'white';
 
-window.addEventListener('keydown', function(event) {
-  const userInput: string = event.key.toLowerCase();
-  const key = userInput.toUpperCase() as keyof typeof cubeDict;
+const cssObject = new CSS3DObject(div);
+// cssObject.position.copy(cubeA.position);
+scene.add(cssObject);
 
-  if ('abcdefg'.includes(userInput)) {
-    if (!cubeDict[key][1]) {
-      cubeDict[key][0].translateY(-0.5);
-      cubeDict[key][1] = true;
-    }
-  }
+cssObject.element.addEventListener('mouseover', function() {
+    controls.enabled = false;
+});
+
+cssObject.element.addEventListener('mouseout', function() {
+    controls.enabled = true;
 });
 
 
-window.addEventListener('keyup', function(event) {
-  const userInput: string = event.key.toLowerCase();
-  const key = userInput.toUpperCase() as keyof typeof cubeDict;
-
-  if ('abcdefg'.includes(userInput)) {
-      cubeDict[key][0].translateY(0.5);
-      cubeDict[key][1] = false;
-  }
-});
-
+initializeVexflow(div);
