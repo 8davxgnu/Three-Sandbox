@@ -8,13 +8,12 @@ import {
     renderStaveNotes,
     generateClef,
     getEnabledClefs
-} from './util_musicBuilder.js'
+} from './vexflow-util.js'
 import { Formatter, Renderer, Stave, Voice } from 'vexflow'
 // ---------------------------------------------------------------------------------------------
 export function initializeVexflow(containerElement) {
-    // Find elements *inside* the container passed from main.ts
     const outputDiv = containerElement.querySelector('#output');
-    const startButton = containerElement.querySelector('#startGameButton');
+    const startButton = containerElement.querySelector('#startGameButton'); 
 
     if (!outputDiv || !startButton) {
         console.error("Required elements for VexFlow not found in the container!");
