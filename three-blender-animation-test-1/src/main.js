@@ -48,6 +48,9 @@ loader.load(
   }
 );
 
+const light = new THREE.PointLight(0xFFBD59, 1, 0, 0.0);
+light.position.set(0,5,0);
+scene.add(light);
 
 const Clock = new THREE.Clock;
 //  Animation Loop
@@ -60,7 +63,7 @@ function animate() {
 }
 renderer.setAnimationLoop( animate );
 
-let on = false;
+let on = true;
 window.addEventListener('keydown', function(event){
   const userInput = event.key.toLowerCase();
   if (userInput.toLowerCase() == 'a' && actionOn && !on) {
