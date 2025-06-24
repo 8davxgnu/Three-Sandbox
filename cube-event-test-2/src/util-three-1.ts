@@ -7,14 +7,7 @@ export function createScene() {
   return { scene, camera, renderer };
 }
 
-/**
- * 
- * @param {number[]} param0 
- * @param {string} color 
- * @param {number[]} param2 
- * @returns  {THREE.Mesh}
- */
-export function createCube([a,b,c], color, [x, y, z]) {
+export function createCube([a,b,c]: number[], color: number, [x, y, z]: number[]) {
   const geometry = new THREE.BoxGeometry( a, b, c );
   const material = new THREE.MeshBasicMaterial({color: color});
   const cube = new THREE.Mesh( geometry, material );
