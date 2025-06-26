@@ -21,14 +21,19 @@ controls.update();
 
 // Load external models
 let mixer, actionOn, actionOff;
+let mixer1, pedalA, pedalB, pedalC, pedalD, pedalE, pedalF, pedalG;
+let trebleON, trebleOFF, bassON, bassOFF, tenorON, tenorOFF, altoON, altoOFF;
+
 const loader = new GLTFLoader();
 loader.load(
   '/switch.glb',
   function(glb) {
     scene.add( glb.scene );
+    glb.scene.position.set(8,0,0);
     mixer = new THREE.AnimationMixer(glb.scene);
 
     const animations = glb.animations;
+    console.log(animations);
     actionOn = mixer.clipAction(THREE.AnimationClip.findByName(animations, 'switch-ON'));
     actionOff = mixer.clipAction(THREE.AnimationClip.findByName(animations, 'switch-OFF'));
 
@@ -47,15 +52,28 @@ loader.load(
     console.log( 'Error while loading model.', error);
   }
 );
+loader.load(
+  'machine1-v2.glb',
+  function(glb) {
+    scene.add(glb.scene);
+    glb.scene.position.set(-5,0,0)
+    mixer1 = new THREE.AnimationMixer(glb.scene);
+    const animations1 = glb.animations;
+    console.log(animations1);
+    trebleON = mixer1.clipAction(THREE.AnimationClip.findByName(animations1, 'treble-ON'));
+    pedalG = mixer1.clipAction(THREE.AnimationClip.findByName(animations1, 'pedal-G'));
+  }
+);
 
 const light = new THREE.PointLight(0xFFBD59, 1, 0, 0.0);
 light.position.set(0,5,0);
 scene.add(light);
+// const hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFF, 1);
+// scene.add(hemisphereLight);
 
 const Clock = new THREE.Clock;
 //  Animation Loop
 function animate() {
-  requestAnimationFrame(animate);
   const delta = Clock.getDelta();
   if (mixer) mixer.update(delta);
 
@@ -73,12 +91,21 @@ window.addEventListener('keydown', function(event){
   };
 });
 
-window.addEventListener('keyup', function(event){
+window.addEventListener('keydown', function(event){
   const userInput = event.key.toLowerCase();
   if (userInput.toLowerCase() == 'b' && actionOff && on) {
     actionOn?.stop();
     actionOff.play();
     on = false;
+    console.log(actionOff);
   };
 });
 
+window.addEventListener('keydown', function(event){
+  const userInput = event.key.toLowerCase();
+  if (userInput.toLowerCase() == 'c') {
+    trebleON.play();
+    console.log(pedalG);
+    console.log(trebleON);
+  };
+});
